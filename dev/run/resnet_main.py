@@ -39,12 +39,6 @@ val_transform = transforms.Compose([
     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
 ])
 
-test_transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-])
-
 # 数据集地址
 train_dir = "C:/Users/z/Desktop/interpretability/datasets/train"
 train_datasets = datasets.ImageFolder(train_dir, transform=train_transform)
@@ -147,33 +141,11 @@ log_dir = "C:/Users/z/Desktop/interpretability/dev/run/resnet_50.pth"
 def testing () :
     checkpoint = torch.load(log_dir)
     model.load_state_dict(checkpoint['model'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
 
     if torch.cuda.is_available() :
         model.cuda()
 
     val(model, val_dataloader)
-
-def testOnce(path) :
-    image = Image.open(path)
-    image = test_transform(image)
-    image = torch.reshape(image, (1, 3, 224, 224))
-
-    checkpoint = torch.load(log_dir)
-    model.load_state_dict(checkpoint['model'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
-
-    if torch.cuda.is_available() :
-        model.cuda()
-
-    model.eval()
-    with torch.no_grad() :
-        image = image.cuda()
-        out = model(image)
-        _, predicted = torch.max(out, 1)
-        print(predicted)
-    
-
 
 def training () :
     if torch.cuda.is_available() :
